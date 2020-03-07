@@ -1,4 +1,4 @@
-package dynamic_beat_14;
+package dynamic_beat_15;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -59,7 +59,13 @@ public class Game extends Thread {//Thread 는 하나의 프로그램에서 실행되는 작은 
 		//Y축이 580 이 PinPoint
 		for(int i=0;i<noteList.size();i++) {
 			Note note=noteList.get(i);
-			note.screenDraw(g);		
+			if(!note.isProceeded()) { //사용되지 않는 노트는 화면에서 자동 삭제
+				noteList.remove(i);
+				i--;
+				}
+			else {
+				note.screenDraw(g);
+			}
 		}
 		g.setColor(Color.white);
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -83,32 +89,40 @@ public class Game extends Thread {//Thread 는 하나의 프로그램에서 실행되는 작은 
 		
 	}
 	public void pressS() { //S버튼을 눌렀을 경우 파란색으로 바뀜(게임 실행 화면의 노트 라인이)
+		judge("S");
 		noteRouteSImage= new ImageIcon(Main.class.getResource("../images/noteRoutePressed.png")).getImage();
 		new Music("drumSmall1.mp3",false).start();
 	}
+	
 	public void pressD() { //D버튼을 눌렀을 경우 파란색으로 바뀜(게임 실행 화면의 노트 라인이)
+		judge("D");
 		noteRouteDImage= new ImageIcon(Main.class.getResource("../images/noteRoutePressed.png")).getImage();
 		new Music("drumSmall2.mp3",false).start();
 	}
 	public void pressF() { //F버튼을 눌렀을 경우 파란색으로 바뀜(게임 실행 화면의 노트 라인이)
+		judge("F");
 		noteRouteFImage= new ImageIcon(Main.class.getResource("../images/noteRoutePressed.png")).getImage();
 		new Music("drumSmall3.mp3",false).start();
 	}
 	public void pressSpace() { //Space버튼을 눌렀을 경우 파란색으로 바뀜(게임 실행 화면의 노트 라인이)
+		judge("Space");
 		noteRouteSpace1Image= new ImageIcon(Main.class.getResource("../images/noteRoutePressed.png")).getImage();
 		noteRouteSpace2Image= new ImageIcon(Main.class.getResource("../images/noteRoutePressed.png")).getImage();
 		//Space버튼 1개로 Space1,2를 동시 조작
 		new Music("drumBig1.mp3",false).start();
 	}
 	public void pressJ() { //J버튼을 눌렀을 경우 파란색으로 바뀜(게임 실행 화면의 노트 라인이)
+		judge("J");
 		noteRouteJImage= new ImageIcon(Main.class.getResource("../images/noteRoutePressed.png")).getImage();
 		new Music("drumSmall3.mp3",false).start();
 	}
 	public void pressK() { //K버튼을 눌렀을 경우 파란색으로 바뀜(게임 실행 화면의 노트 라인이)
+		judge("K");
 		noteRouteKImage= new ImageIcon(Main.class.getResource("../images/noteRoutePressed.png")).getImage();
 		new Music("drumSmall2.mp3",false).start();
 	}
 	public void pressL() { //L버튼을 눌렀을 경우 파란색으로 바뀜(게임 실행 화면의 노트 라인이)
+		judge("L");
 		noteRouteLImage= new ImageIcon(Main.class.getResource("../images/noteRoutePressed.png")).getImage();
 		new Music("drumSmall1.mp3",false).start();
 	}
@@ -139,16 +153,23 @@ public class Game extends Thread {//Thread 는 하나의 프로그램에서 실행되는 작은 
 
 	@Override
 	public void run() {
-		dropNotes(); //노트가 떨어질수 있도록 함
+		dropNotes(this.titleName); //노트가 떨어질수 있도록 함
 
 	}
 	public void close() {
 		gameMusic.close();
 		this.interrupt();
 	}
-	public void dropNotes() {
+	public void dropNotes(String titleName) {
 		Beat[] beats =null;{ //class에다가 변수 선언?
-				if(titleName.equals("officialdism_fate")) {
+				if(titleName.equals("officialdism_fate") && difficulty.equals("Easy")) {
+					int startTime = 1000 - Main.REACH_TIME * 1000;
+					
+					beats = new Beat[] {
+							new Beat(startTime,"Space"),
+							
+					};
+				}	else if(titleName.equals("officialdism_fate") && difficulty.equals("Hard")) {
 					int startTime = 1000 - Main.REACH_TIME * 1000;
 					
 					beats = new Beat[] {
@@ -156,7 +177,15 @@ public class Game extends Thread {//Thread 는 하나의 프로그램에서 실행되는 작은 
 							
 					};
 				}
-				else if(titleName.equals("officialdism_Yesterday")) {
+				else if(titleName.equals("officialdism_Yesterday") && difficulty.equals("Easy")) {
+					int startTime = 4400 - Main.REACH_TIME * 1000;
+					int gap = 130; //최소 박자의 간격
+					beats = new Beat[] {
+							new Beat(startTime,"Space"),
+							new Beat(startTime + gap *2,"J"),
+							new Beat(startTime + gap *4,"D"),
+					};
+				}else if(titleName.equals("officialdism_Yesterday")&& difficulty.equals("Hard")) {
 					int startTime = 4400 - Main.REACH_TIME * 1000;
 					int gap = 130; //최소 박자의 간격
 					beats = new Beat[] {
@@ -165,7 +194,7 @@ public class Game extends Thread {//Thread 는 하나의 프로그램에서 실행되는 작은 
 							new Beat(startTime + gap *4,"D"),
 					};
 				}
-				else if(titleName.equals("officialdism_pretender")) {
+				else if(titleName.equals("officialdism_pretender") && difficulty.equals("Easy")) {
 					int startTime = 3000 - Main.REACH_TIME * 1000;
 					int gap = 180; //Pretender 박자
 					beats = new Beat[] {
@@ -195,7 +224,16 @@ public class Game extends Thread {//Thread 는 하나의 프로그램에서 실행되는 작은 
 							
 							
 					};
+				}else if(titleName.equals("officialdism_pretender") && difficulty.equals("Hard")) {
+					int startTime = 4400 - Main.REACH_TIME * 1000;
+					int gap = 130; //최소 박자의 간격
+					beats = new Beat[] {
+							new Beat(startTime,"Space"),
+							new Beat(startTime + gap *2,"J"),
+							new Beat(startTime + gap *4,"D"),
+					};
 				}
+				
 		
 		};
 		int i=0;
@@ -215,6 +253,16 @@ public class Game extends Thread {//Thread 는 하나의 프로그램에서 실행되는 작은 
 				}catch (Exception e) {
 					e.printStackTrace();
 				}
+			}
+		}
+	}
+	public void judge(String input) {
+		for(int i=0; i<noteList.size(); i++) {
+			Note note=noteList.get(i);
+			if(input.equals(note.getNoteType())) {
+				note.getNoteType();
+				note.judge();
+				break;
 			}
 		}
 	}
